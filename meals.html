@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meals</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="./js/jquery-3.3.1.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script defer src="./js/knockout.js"></script>
+    <script defer src="./viewModels/mealVModel.js"></script>
+    <style>
+        .nav-link {
+            color: #17a2b8;
+        }
+
+        a.nav-link.active {
+            color: #ffc107;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-info">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="./admin.html">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Meals</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./users.html">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./employees.html">Employees</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+    <h1 class="text-center">Meals</h1>
+    <div class="container">
+        <div id="message"></div>
+        <div>
+            <a href="http://localhost:4444/api/meals/menu" target="_blank" download="Menu"
+                class="mb-2 btn btn-warning">Menu
+                PDF</a>
+        </div>
+        <div id="add">
+            <p>
+                <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#addMeal"
+                    aria-expanded="false" aria-controls="addMeal" data-bind="click:addMeal()">
+                    <!-- Button with data-target -->
+                    Add New Meal
+                </button>
+            </p>
+            <div class="collapse" id="addMeal">
+                <div class="card card-body">
+                    <form id="mealForm" method="POST" enctype="multipart/form-data">
+                        <input type="text" name="type" id="type">
+                        <input type="text" name="id" id="id">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input type="number" min="1" step=".1" class="form-control" id="price" name="price"
+                                placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select data-bind="options:categories" class="form-control" id="category">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="image">Image</label>
+                            <input type="file" class="form-control-file" id="image" name="image">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <button class="btn btn-info" type="submit">Save</button>
+                        <button class="btn btn-secondary" data-toggle="collapse" data-target="#addMeal"
+                            aria-expanded="false" aria-controls="addMeal" data-bind="click:addMeal()"
+                            type="button">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="display mt-4" data-bind="">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="lunch-tab" data-toggle="tab" href="#lunch" role="tab"
+                        aria-controls="lunch" aria-selected="true">Lunch</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="breakfast-tab" data-toggle="tab" href="#breakfast" role="tab"
+                        aria-controls="breakfast" aria-selected="false">Breakfast</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="dinner-tab" data-toggle="tab" href="#dinner" role="tab"
+                        aria-controls="dinner" aria-selected="false">Dinner</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="dessert-tab" data-toggle="tab" href="#dessert" role="tab"
+                        aria-controls="dessert" aria-selected="false">Dessert</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="lunch" role="tabpanel" aria-labelledby="lunch-tab">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Image</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Controls</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:lunch">
+                            <tr>
+                                <th class="align-middle" data-bind="text:$index" scope="row"></th>
+                                <td class="align-middle">
+                                    <img height="75" width="75" class="img-responsive" data-bind="attr:{src:image}">
+                                    <!-- <img height="75" width="75" class="img-responsive"
+                                        src="../images/menu/breakfast/break_1.jpg" data-bind="attr:{alt:image}"> -->
+                                </td>
+                                <td class="align-middle" data-bind="text:mealName"></td>
+                                <td class="align-middle" data-bind="text:description"></td>
+                                <td class="align-middle" data-bind="text:'$'+price"></td>
+                                <td class="align-middle">
+                                    <!-- <div class="edit mb-2">
+                                        <p>
+                                            <button class="btn btn-success" type="button" data-toggle="collapse"
+                                                data-target="#editMeal" aria-expanded="false" aria-controls="editMeal">
+                                                <!-- Button with data-target --
+                                                Edit
+                                            </button>
+                                        </p>
+                                        <div class="collapse" id="editMeal">
+                                            <div class="card card-body">
+                                                <form id="editForm" method="POST" enctype="multipart/form-data">
+                                                    <div class="form-group">
+                                                        <label for="e-title">Title</label>
+                                                        <input data-bind="value:mealName" type="text"
+                                                            class="form-control" id="e-title" name="title"
+                                                            placeholder="name@example.com">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="price">Price</label>
+                                                        <input data-bind="value:price" type="number" min="1" step=".1"
+                                                            class="form-control" id="price" name="price"
+                                                            placeholder="name@example.com">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="e-category">Category</label>
+                                                        <select data-bind="options:$data.categories"
+                                                            class="form-control" id="e-category">
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="e-image">Image</label>
+                                                        <input type="file" class="form-control-file" id="e-image"
+                                                            name="image">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="e-description">Description</label>
+                                                        <textarea data-bind="text:description" class="form-control"
+                                                            id="e-description" name="description" rows="3"></textarea>
+                                                    </div>
+                                                    <button class="btn btn-success" type="submit">Save</button>
+                                                    <button class="btn btn-info" type="submit" data-toggle="collapse"
+                                                        data-target="#editMeal" aria-expanded="true"
+                                                        aria-controls="editMeal">Cancel</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <button class="btn btn-success" type="button" data-toggle="collapse"
+                                        data-target="#addMeal" aria-expanded="false" aria-controls="addMeal"
+                                        data-bind="click:editMeal(_id, mealName, price, category, description)">
+                                        Edit
+                                    </button>
+                                    <div>
+                                        <button type="button" class="btn btn-danger mt-2" data-toggle="modal"
+                                            data-target="#delModal" data-bind="click:deleteMeal(_id)">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="breakfast" role="tabpanel" aria-labelledby="breakfast-tab">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Image</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Controls</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:breakfast">
+                            <tr>
+                                <th class="align-middle" data-bind="text:$index" scope="row"></th>
+                                <td class="align-middle">
+                                    <img height="75" width="75" class="img-responsive" data-bind="attr:{src:image}">
+                                    <!-- <img height="75" width="75" class="img-responsive"
+                                                            src="../images/menu/breakfast/break_1.jpg" data-bind="attr:{alt:image}"> -->
+                                </td>
+                                <td class="align-middle" data-bind="text:mealName"></td>
+                                <td class="align-middle" data-bind="text:description"></td>
+                                <td class="align-middle" data-bind="text:'$'+price"></td>
+                                <td class="align-middle">
+                                    <button class="btn btn-success" type="button" data-toggle="collapse"
+                                        data-target="#addMeal" aria-expanded="false" aria-controls="addMeal"
+                                        data-bind="click:editMeal(_id, mealName, price, category, description)">
+                                        Edit
+                                    </button>
+                                    <div>
+                                        <button type="button" class="btn btn-danger mt-2" data-toggle="modal"
+                                            data-target="#delModal" data-bind="click:deleteMeal(_id)">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="dinner" role="tabpanel" aria-labelledby="dinner-tab">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Image</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Controls</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:dinner">
+                            <tr>
+                                <th class="align-middle" data-bind="text:$index" scope="row"></th>
+                                <td class="align-middle">
+                                    <img height="75" width="75" class="img-responsive" data-bind="attr:{src:image}">
+                                    <!-- <img height="75" width="75" class="img-responsive"
+                                                            src="../images/menu/breakfast/break_1.jpg" data-bind="attr:{alt:image}"> -->
+                                </td>
+                                <td class="align-middle" data-bind="text:mealName"></td>
+                                <td class="align-middle" data-bind="text:description"></td>
+                                <td class="align-middle" data-bind="text:'$'+price"></td>
+                                <td class="align-middle">
+                                    <button class="btn btn-success" type="button" data-toggle="collapse"
+                                        data-target="#addMeal" aria-expanded="false" aria-controls="addMeal"
+                                        data-bind="click:editMeal(_id, mealName, price, category, description)">
+                                        Edit
+                                    </button>
+                                    <div>
+                                        <button type="button" class="btn btn-danger mt-2" data-toggle="modal"
+                                            data-target="#delModal" data-bind="click:deleteMeal(_id)">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="dessert" role="tabpanel" aria-labelledby="dessert-tab">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Image</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Controls</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:dessert">
+                            <tr>
+                                <th class="align-middle" data-bind="text:$index" scope="row"></th>
+                                <td class="align-middle">
+                                    <img height="75" width="75" class="img-responsive" data-bind="attr:{src:image}">
+                                    <!-- <img height="75" width="75" class="img-responsive"
+                                                                            src="../images/menu/breakfast/break_1.jpg" data-bind="attr:{alt:image}"> -->
+                                </td>
+                                <td class="align-middle" data-bind="text:mealName"></td>
+                                <td class="align-middle" data-bind="text:description"></td>
+                                <td class="align-middle" data-bind="text:'$'+price"></td>
+                                <td class="align-middle">
+                                    <button class="btn btn-success" type="button" data-toggle="collapse"
+                                        data-target="#addMeal" aria-expanded="false" aria-controls="addMeal"
+                                        data-bind="click:editMeal(_id, mealName, price, category, description)">
+                                        Edit
+                                    </button>
+                                    <div>
+                                        <button type="button" class="btn btn-danger mt-2" data-toggle="modal"
+                                            data-target="#delModal" data-bind="click:deleteMeal(_id)">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- delete modal -->
+    <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="delModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="delModalLabel">Delete Meal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" id="delMeal">
+                    <div class="modal-body">
+                        <input type="text" id="delId">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- end of modal -->
+</body>
+
+</html>
